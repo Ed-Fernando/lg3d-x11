@@ -1,0 +1,79 @@
+#!/bin/csh -f
+#
+# lg3d-x11-build <dir>
+#
+# Runs lg3d-x11-install in the current working directory and
+# installs it into a temporary directory. Then bundles it up 
+# with tar and gzip. The VERSION file in the bundle is used
+# to name the bundle, as is the platform. Then the bundle is 
+# moved into <dir>/$os/$arch. The default for <dir> is
+# /var/tmp/x11builds. The directory will be created if necessary.
+
+set tmp = $0
+set scriptdir = ${tmp:h}
+
+set arch = `/bin/arch`
+if ($arch == i86pc) then
+    set os = solaris
+else
+if ($arch == i686) then
+    set os = linux
+else
+if ($arch == x86_64) then
+    set os = linux
+else
+    echo "Cannot build LG X11 on architecture " $arch
+    exit 1
+endif
+endif
+endif
+
+set bundle_dir_parent = $1
+if ("$bundle_dir_parent" == "") then
+    set bundle_dir_parent = /var/tmp/x11builds
+endif
+
+set bundle_dir = $bundle_dir_parent/$os/$arch
+if (! -e $bundle_dir) then
+    mkdir -p $bundle_dir
+endif
+
+set tmpdir = /var/tmp/lg3d-x11-$os-$arch.$$
+/bin/rm -rf $tmpdir
+mkdir -p $tmpdir
+$scriptdir/lg3d-x11-install $tmpdir/lg3d-x11
+
+set version = `/bin/cat $tmpdir/lg3d-x11/VERSION`
+echo $version
+set bundle = lg3d-x11-$os-$arch-$version
+set bundle_full = "$bundle_dir/$bundle"
+if (-e $bundle_full.tar || -e $bundle_full.tar.gz) then
+    echo "WARNING: $bundle_full already exists. "
+    echo -n "Replace it (y/n)? "
+    set response = $<
+    if ("$response" != "y") then
+	/bin/rm -rf $tmpdir
+	echo "Operation aborted at user request"
+	exit 1
+    endif
+    /bin/rm -rf $bundle_full.tar $bundle_full.tar.gz
+endif
+
+cd $tmpdir
+
+echo -n "Tarring up bundle ..."
+/bin/tar cfp $bundle_full.tar lg3d-x11
+echo " "
+
+echo -n "Gzipping bundle ..."
+/bin/gzip $bundle_full.tar
+echo " "
+
+echo -n "Removing temp directory ..."
+cd /
+/bin/rm -rf $tmpdir
+echo " "
+
+echo "Build complete."
+ls -l $bundle_full.tar.gz
+

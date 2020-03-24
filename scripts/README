@@ -1,0 +1,70 @@
+
+Building the lg3d-x11.tar.gz bundle
+-----------------------------------
+
+This directory contains the lg3d-x11-build script which creates
+a gzipped tar bundle which can be installed in the lg3d-x11 CVS
+workspace. This directory also contains an auxilliary script 
+lg3d-x11-install which is invoked by lg3d-x11-build.
+
+1. First, you need to check out a copy of the Xorg monolithic server
+   branch lg3d-dev. Let $XORGDIR be the parent xc directory of this
+   copy.
+
+2. Next, you need to build the X server
+
+   % cd $XORGDIR
+   % make World
+
+3. Next, make sure you are in $XORGDIR and then type
+   lg3d-x11-build <dir>. (<dir> is the directory in which
+   the bundle will be installed). For example:
+
+   % cd $XORGDIR
+   % lg3d-x11/scripts/lg3d-x11-build /tmp/myx11builds
+
+   You will be asked to provide the version number of
+   the bundle. The version number usually starts with 'dev'
+   if it is an interim development bundle or 'release' if
+   it the bundle is for an official LG release. Next comes
+   the release version number (e.g. 0-8-0) and then the 
+   build number (e.g. -6). For example:
+   
+   Creating VERSION file.
+   Please enter the version identifier (e.g. release-x-y-z) followed by ENTER and ^D
+   > dev-0-8-0-6
+   ^D
+
+   IMPORTANT: you must type Control-D after hitting ENTER!
+
+At this point the bundle will be built and installed in the
+directory <dir>/$os/$arch, where $os is the the O.S. you are
+of the machine you built on and $arch is the architecture.
+
+The bundle will be named as follows:
+
+lg3d-x11-<os>-<arch>-<version>.tar.gz
+
+(e.g. lg3d-x11-solaris-i86pc-dev-0-8-0-8.tar.gz)
+
+
+Integrating the bundle in the lg3d-x11 CVS
+------------------------------------------
+
+1. Check out the lg3d-x11 CVS head. 
+
+2. cd $os/$arch
+
+3. rm lg3d-x11.tar.gz
+
+4. Copy the bundle from where it was installed in the
+   previous step into this directory, renaming it 
+   lg3d-x11.tar.gz in the process.
+
+5. Make sure that the <interfaceProvided> element in 
+   the version.xml in this directory correctly reflects
+   the LGE interface version numbers (<major>.<minor>) 
+   of the bundle you are installing.
+
+At this point you can do a commit to integrate your 
+changes into the CVS.

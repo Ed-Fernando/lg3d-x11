@@ -1,0 +1,125 @@
+#!/bin/csh -f
+#
+# lg3d-x11-install <destdir>
+#
+# Installs the libraries and executables that are used by the 
+# lg3d-session into the given destination directory. It also 
+# installs the include files necessary to build the LG3D Display
+# Server. In order to run lg3d-session or build the Display Server,
+# you must first run this script, and then set the environment 
+# variable LG3DX11HOME to the chosen <destdir>.
+#
+# You must run this script in the top-level directory of the 
+# lg3d-x11 build you wish to install.
+#
+# If <destdir> doesn't exist, this script creates it
+#
+# Note: the directory structure of the destination directory 
+# is isomorphic with the directory structure of X11 source tree.
+#
+# $RCSfile: lg3d-x11-install,v $
+# 
+# Copyright (c) 2004, Sun Microsystems, Inc. 
+# 
+# Permission to use, copy, modify, distribute, and sell this software and its
+# documentation for any purpose is hereby granted without fee, provided that
+# the above copyright notice appear in all copies and that both that
+# copyright notice and this permission notice appear in supporting
+# documentation.
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+# OPEN GROUP BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+# AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Except as contained in this notice, the name of The Open Group shall not be
+# used in advertising or otherwise to promote the sale, use or other dealings
+# in this Software without prior written authorization from The Open Group.
+# 
+# $Revision: 1.3 $
+# $Date: 2006-07-25 17:24:08 $
+# $State: Exp $
+
+set destdir = "$1"
+set usage   = "USAGE: lg3d-x11-install <destdir>"
+
+set arch = `/bin/arch`
+if ($arch == i86pc) then
+    set os = solaris
+else
+if ($arch == i686) then
+    set os = linux
+else
+if ($arch == x86_64) then
+    set os = linux
+else
+    echo "Cannot build LG X11 on architecture " $arch
+    exit 1
+endif
+endif
+endif
+
+if ("$destdir" == "") then
+    echo $usage
+    exit 1
+endif
+
+set srctopdir = `pwd`
+set exportsdir = $srctopdir/exports
+
+if (! -e $destdir) then
+    mkdir -p $destdir
+endif
+
+# Absolutify the path
+cd $destdir
+set destdir = `pwd`
+
+# Transfer version file
+echo "Creating VERSION file."
+echo "Please enter the version identifier (e.g. release-x-y-z) followed by ENTER and ^D"
+cd $srctopdir
+echo -n "> "
+cat >! $destdir/VERSION
+echo "  "
+
+# Transfer all of the exports directory
+echo -n "Installing exports ..."
+mkdir -p $destdir/exports
+cd $srctopdir
+tar cfh - exports | (cd $destdir; tar xfBph -)
+echo " "
+
+# Bug fix for Solaris x86
+# Note: the libX11.so from the Solaris x86 lg3d xorg build
+# has locale problems. Remove it so that the libX11.so in 
+# the standard location will be used.
+if (`/bin/arch` == i86pc) then
+    /bin/rm -f $destdir/exports/lib/libX11.so*
+    # We must remove libXext.so in order to fix 663
+    /bin/rm -f $destdir/exports/lib/libXext.so*
+endif
+
+# Must remove the Mesa libraries
+/bin/rm -f $destdir/exports/lib/libGL*
+/bin/rm -f $destdir/exports/lib/modules/extensions/libglx.so
+
+# Transfer X server
+echo -n "Installing X servers ..."
+mkdir -p $destdir/programs/Xserver
+cd $srctopdir/programs/Xserver
+cp Xorg $destdir/programs/Xserver
+if (! -e Xvfb) then
+    echo "ERROR: Xvfb doesn't exist."
+    echo "Installation aborted!
+    exit 1
+endif
+cp Xvfb $destdir/programs/Xserver
+echo " "
+
+echo "Installation into $destdir is complete."

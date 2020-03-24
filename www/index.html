@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Project Looking Glass X11 Build Repository</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+</head>
+<body>
+<div class="moz-text-plain" wrap="true" graphical-quote="true"
+ style="font-family: -moz-fixed; font-size: 12px;" lang="x-western">
+</div>
+<div class="moz-text-plain" wrap="true" graphical-quote="true"
+ style="font-family: -moz-fixed; font-size: 12px;" lang="x-western">
+</div>
+<div class="moz-text-html" lang="x-western">
+<h2>Welcome to Project Looking Glass X11 Build Repository!<br>
+</h2>
+<p>
+lg3d-x11 is a sub-project of the java.net lg3d project. It contains
+pre-packaged distributions of the LG X11 servers. These distributions
+(aka builds) are contained in the cvs tree of this sub-project. The lg3d-x11 X distribution is a version of the X.org X11R6.8.2 release which has been modified for use with LG3D.
+<p>
+<b>For documentation on the LG modifications to the Xorg server, refer to 
+<a href="http://xorg.freedesktop.org/wiki/LookingGlassIntegration">
+http://xorg.freedesktop.org/wiki/LookingGlassIntegration</a></b>.
+<p>
+For every branch of the lg3d-core cvs there is a corresponding branch
+of the lg3d-x11 cvs with the same name. For example, for the dev
+branch of lg3d-core cvs there is an lg3d-x11 cvs branch named lg3d-dev.
+<p>
+HISTORICAL NOTE: The X11 builds used to be stored in the lg3d-core cvs itself.
+With the addition of Solaris x86 support and app mode the size of the build
+started to get to large to keep in lg3d-core. Also, many developers use only dev
+mode to run LG and this mode doesn't require X11 at all. So it didn't make 
+sense to force people to download bits that they weren't using.
+<p>
+<b>TO BUILD LG3D-CORE WITHOUT X11 SUPPORT:</b>
+<p>
+In order to build lg3d-core without X11 support all you need to do is 
+check out the lg3d-core and lg3d-demo-apps cvs trees, go into lg3d-core
+and type 'ant'. There is no need to have a copy of the lg3d-x11 cvs present.
+<p>
+With this type of build, you will be able to run lg3d-dev. But if you 
+try to run lg3d-session or lg3d-app, an error message will be generated
+because X11 support will not be available.
+<p>
+<b>TO BUILD LG3D-CORE WITH X11 SUPPORT:</b>
+<p>
+In order to build lg3d-core with X11 support, not only do you need
+to check out the lg3d-core and lg3d-demo-apps cvs trees, but you
+also need to check out the corresponding branch of the lg3d-x11 cvs tree.
+lg3d-x11 must be a sibling directory of lg3d-core.
+<p>
+To check out builds for all supported platforms:
+<p>
+<blockquote><span
+ style="font-family: courier new,courier,monospace;">
+cvs checkout -r <i>branch-name</i> lg3d-x11
+</span></blockquote>
+<p>
+To only check out the build for specific platform:
+<p>
+<blockquote><span
+ style="font-family: courier new,courier,monospace;">
+cvs checkout -r <i>branch-name</i> lg3d-x11/<i>platform</i>/<i>arch</i>
+</span></blockquote>
+<p>
+The currently supported values of <span style="font-family: courier new,courier,monospace;"><i>platform</i>/<i>arch</i></span> are:
+<blockquote><span
+ style="font-family: courier new,courier,monospace;">
+    linux/i686 
+<br>
+    linux/x86_64</span> (AMD64)
+<br><span
+ style="font-family: courier new,courier,monospace;">
+    solaris/i86pc</span> (for Solaris x86).
+</blockquote>
+<p>
+<b>TO ACCESS THE LG X11 SOURCE:</b>
+<p>
+The LG X11 is available in a branch of the X.org cvs trunk on 
+freedesktop.org (http://freedesktop.org/Software/xorg). The master branch name 
+is 'lg3d'. At the time of this writing, the current development branch is lg3d-dev
+For information on how to get access 
+to the X.org cvs tree, refer to http://freedesktop.org/XOrg/CvsPage.</b>
+<p>
+If you don't plan to make modifications to the source, you can check out
+a copy of the source tree in anonymous mode by doing the following:
+<p>
+<blockquote><span
+ style="font-family: courier new,courier,monospace;">
+cvs -d:pserver:anoncvs@pdx.freedesktop.org:/cvs co -r lg3d-dev xc 
+</span></blockquote>
+<p>
+If you wish to be able to make modifications to the source, you 
+will need to check out a copy of the tree in developer mode. 
+To do this, you will need to register as an Xorg freedesktop
+developer. Instructions are provided in http://www.freedesktop.org/Main/UsingCvs,
+in the section "Using developer CVS".
+<p>
+Caveat: I found that I needed to make some modifications to these developer
+instructions. Here is what worked for me:
+<p>
+<blockquote><span
+ style="font-family: courier new,courier,monospace;">
+% setenv CVS_RSH /usr/bin/ssh
+<br>
+% setenv CVSROOT :ext:<i>my-user-name</i>@pdx.freedesktop.org:/cvs/xorg
+<br>
+</span></blockquote>
+(Note: it's pdx. not cvs. as described on the web page)
+<p>
+<b>NOTE: This project does not currently have its own issues list.
+Instead, please use the "X11 integration" subcomponent
+in the <a href="https://lg3d-core.dev.java.net/servlets/ProjectIssues">Issue
+Tracker</a> of the lg3d-core project. If you encounter any
+issues with lg3d-x11,
+please file them there.</b>
+</p>
+<b>DEVELOPER CONVENTIONS:</b>
+<p>
+Here are some conventions developers should follow when integrating
+new bits into this cvs:
+<ol>
+<li>Whenever you make a change to the x11 source code, be sure to increment
+the value of the variable lgeint.h:LG3D_IMPLEMENTATION by 1. This is a client-visible
+variable which distinguishes unique builds of LG X11.</li>
+<br>
+<li>When you integrate code into the Xorg CVS or into the lg3d-x11 cvs, be sure
+to include the major and minor interface numbers in the CVS comment if either number
+has changed. These numbers are defined in xc/include/extensions/lgewire.h.
+</ol>
+<b>CONCLUSION:</b>
+<p>
+Thanks for your interest in the project and spending your time reading
+this.&nbsp;
+We hope you will join our project and explore this fun opportunity
+with us.
+</p>
+<p>
+The Project Looking Glass Development Team
+</p>
+</body>
+</html>
